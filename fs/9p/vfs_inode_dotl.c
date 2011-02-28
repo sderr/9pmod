@@ -662,11 +662,11 @@ v9fs_vfs_link_dotl(struct dentry *old_dentry, struct inode *dir,
 		 * This dentry will be released immediately. So, just hold the
 		 * inode
 		 */
-		ihold(old_dentry->d_inode);
 #if RHEL6_COMPAT
 		dentry->d_op = &v9fs_dentry_operations;
 #endif
 	}
+	ihold(old_dentry->d_inode);
 	d_instantiate(dentry, old_dentry->d_inode);
 
 	return err;
