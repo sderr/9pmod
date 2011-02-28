@@ -441,8 +441,8 @@ v9fs_file_write_internal(struct inode *inode, struct p9_fid *fid,
 			 loff_t *offset, int invalidate)
 {
 	int n;
-	size_t total = 0;
 	loff_t i_size;
+	size_t total = 0;
 	struct p9_client *clnt;
 	loff_t origin = *offset;
 	unsigned long pg_start, pg_end;
