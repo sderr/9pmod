@@ -124,6 +124,7 @@ struct v9fs_inode {
 	struct p9_qid *fscache_key;
 #endif
 	struct p9_fid *writeback_fid;
+	struct mutex v_mutex;
 	struct inode vfs_inode;
 };
 
