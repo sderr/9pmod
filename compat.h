@@ -5,6 +5,7 @@
 
 /* use when changing the code is unavoidable */
 #define RHEL6_COMPAT 1
+#define CONFIG_NET_9P_DEBUG 1
 
 /* prereqs for 9p includes pulled in early with -include */
 #include <linux/types.h>
@@ -13,7 +14,7 @@
 #include <linux/errno.h>
 #include <linux/fs.h>
 #include <linux/sched.h>
-#include <linux/parser.h> /* careful: not set up for multiple includes */
+//#include <linux/parser.h> /* careful: not set up for multiple includes */
 
 /* missing */
 #include <linux/magic.h>
@@ -23,9 +24,19 @@
 
 /* missing */
 #include <linux/kernel.h>
+#undef pr_fmt /* defined by kernel.h but we don't want it. */
+#include <linux/version.h>
+
 #ifndef USHRT_MAX
 #define USHRT_MAX ((u16)(~0U))
 #endif
+
+
+/* missing */
+#include <linux/nsproxy.h>
+
+#define P9_DPRINTK p9_debug
+#define P9_EPRINTK(level, args...) printk(level args)
 
 /* missing - copied from fs/attr.c in 2.6.38-rc2 */
 static __inline__
@@ -57,5 +68,25 @@ void setattr_copy(struct inode *inode, const struct iattr *attr)
 
 /* missing */
 #define flush_work_sync flush_work
+
+#include <linux/net.h>
+#include <linux/syscalls.h> /* killme */
+
+static inline struct file *sock_alloc_file(struct socket *sock, int flags, const char *dname)
+{
+	int fd;
+	fd = sock_map_fd(sock, 0);
+	if (fd < 0)
+		return ERR_PTR(fd);
+	get_file(sock->file);
+	sys_close(fd);  /* still racy */
+	return sock->file;
+}
+
+struct p9_fid;
+extern ssize_t v9fs_fid_readn(struct p9_fid *fid, char *data, char __user *udata, u32 count,
+	       u64 offset);
+extern ssize_t v9fs_fid_writen(struct p9_fid *fid, const char *data, const char __user *udata, u32 count,
+	       u64 offset);
 
 #endif /* _RHEL6_COMPAT_H */

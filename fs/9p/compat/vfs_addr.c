@@ -40,6 +40,7 @@
 #include "v9fs_vfs.h"
 #include "cache.h"
 
+/*
 static void v9fs_vfs_readpage_async_cb(struct page *page, char *data, int len)
 {
 	struct inode *inode = page->mapping->host;
@@ -63,9 +64,14 @@ static void v9fs_vfs_readpage_async_cb(struct page *page, char *data, int len)
 done:
 	unlock_page(page);
 }
+*/
+
 
 static int v9fs_vfs_readpage_async(struct file *filp, struct page *page)
 {
+	return -ENOSYS;
+/*
+
 	int retval;
 	loff_t offset;
 	struct inode *inode;
@@ -84,6 +90,89 @@ static int v9fs_vfs_readpage_async(struct file *filp, struct page *page)
 	}
 
 	return retval;
+	*/
+}
+
+/**
+ * v9fs_fid_readn - read from a fid
+ * @fid: fid to read
+ * @data: data buffer to read data into
+ * @udata: user data buffer to read data into
+ * @count: size of buffer
+ * @offset: offset at which to read data
+ *
+ */
+ssize_t
+v9fs_fid_readn(struct p9_fid *fid, char *data, char __user *udata, u32 count,
+	       u64 offset)
+{
+	int n, total, size;
+
+	p9_debug(P9_DEBUG_VFS, "fid %d offset %llu count %d\n",
+		 fid->fid, (long long unsigned)offset, count);
+	n = 0;
+	total = 0;
+	size = fid->iounit ? fid->iounit : fid->clnt->msize - P9_IOHDRSZ;
+	do {
+		n = p9_client_read(fid, data, udata, offset, count);
+		if (n <= 0)
+			break;
+
+		if (data)
+			data += n;
+		if (udata)
+			udata += n;
+
+		offset += n;
+		count -= n;
+		total += n;
+	} while (count > 0 && n == size);
+
+	if (n < 0)
+		total = n;
+
+	return total;
+}
+
+/**
+ * v9fs_fid_writen - write from a fid
+ * @fid: fid to write
+ * @data: data buffer to write data from
+ * @udata: user data buffer to write data from
+ * @count: size of buffer
+ * @offset: offset at which to write data
+ *
+ */
+ssize_t
+v9fs_fid_writen(struct p9_fid *fid, const char *data, const char __user *udata, u32 count,
+	       u64 offset)
+{
+	int n, total, size;
+
+	p9_debug(P9_DEBUG_VFS, "fid %d offset %llu count %d\n",
+		 fid->fid, (long long unsigned)offset, count);
+	n = 0;
+	total = 0;
+	size = fid->iounit ? fid->iounit : fid->clnt->msize - P9_IOHDRSZ;
+	do {
+		n = p9_client_write(fid, (char*) data, (char*)udata, offset, count);
+		if (n <= 0)
+			break;
+
+		if (data)
+			data += n;
+		if (udata)
+			udata += n;
+
+		offset += n;
+		count -= n;
+		total += n;
+	} while (count > 0 && n == size);
+
+	if (n < 0)
+		total = n;
+
+	return total;
 }
 
 static int v9fs_vfs_readpage_sync(struct file *filp, struct page *page)
@@ -100,7 +189,7 @@ static int v9fs_vfs_readpage_sync(struct file *filp, struct page *page)
 	buffer = kmap(page);
 	offset = page_offset(page);
 
-	retval = p9_client_readn(fid, buffer, NULL, offset, PAGE_CACHE_SIZE);
+	retval = v9fs_fid_readn(fid, buffer, NULL, offset, PAGE_CACHE_SIZE);
 	if (retval < 0) {
 		v9fs_uncache_page(inode, page);
 		goto done;

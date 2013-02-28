@@ -357,7 +357,7 @@ v9fs_file_read(struct file *filp, char __user *udata, size_t count,
 
 	size = fid->iounit ? fid->iounit : fid->clnt->msize - P9_IOHDRSZ;
 	if (count > size)
-		ret = p9_client_readn(fid, NULL, udata, *offset, count);
+		ret = v9fs_fid_readn(fid, NULL, udata, *offset, count);
 	else
 		ret = p9_client_read(fid, NULL, udata, *offset, count);
 
@@ -405,7 +405,7 @@ v9fs_file_write(struct file *filp, const char __user * data,
 	if (!count)
 		goto out;
 
-	retval = p9_client_writen(fid, NULL, data, origin, count);
+	retval = v9fs_fid_writen(fid, NULL, data, origin, count);
 
 	if (retval > 0) {
 		pg_start = origin >> PAGE_CACHE_SHIFT;
