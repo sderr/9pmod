@@ -155,8 +155,8 @@ static int v9fs_dir_readdir(struct file *filp, void *dirent, filldir_t filldir)
 		return err;
 	while (err == 0) {
 		if (rdir->tail == rdir->head) {
-			err = v9fs_fid_readn(fid, rdir->buf, NULL,
-							filp->f_pos, buflen);
+			err = v9fs_fid_readn(fid, rdir->buf, NULL, buflen,
+							filp->f_pos);
 			if (err <= 0)
 				goto unlock_and_exit;
 

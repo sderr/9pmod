@@ -189,7 +189,7 @@ static int v9fs_vfs_readpage_sync(struct file *filp, struct page *page)
 	buffer = kmap(page);
 	offset = page_offset(page);
 
-	retval = v9fs_fid_readn(fid, buffer, NULL, offset, PAGE_CACHE_SIZE);
+	retval = v9fs_fid_readn(fid, buffer, NULL, PAGE_CACHE_SIZE, offset);
 	if (retval < 0) {
 		v9fs_uncache_page(inode, page);
 		goto done;
