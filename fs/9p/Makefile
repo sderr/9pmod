@@ -1,4 +1,4 @@
-EXTRA_CFLAGS := -Wno-cast-qual \
+EXTRA_CFLAGS += -Wno-cast-qual \
 	-I$(src)/../../include/net/9p \
 	-I$(src)/../../include \
 	-I$(src) \

@@ -1,4 +1,4 @@
-EXTRA_CFLAGS := \
+EXTRA_CFLAGS += \
 	-I$(src)/../../include/net/9p \
 	-I$(src)/../../include \
 	-include $(src)/../../compat.h \
