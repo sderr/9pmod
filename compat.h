@@ -5,7 +5,7 @@
 
 /* use when changing the code is unavoidable */
 #define RHEL6_COMPAT 1
-//#define CONFIG_NET_9P_DEBUG 1
+#define CONFIG_NET_9P_DEBUG 1
 
 /* prereqs for 9p includes pulled in early with -include */
 #include <linux/types.h>

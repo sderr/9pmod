@@ -658,11 +658,7 @@ v9fs_vfs_link_dotl(struct dentry *old_dentry, struct inode *dir,
 		 * This dentry will be released immediately. So, just hold the
 		 * inode
 		 */
-		/* ihold not defined on older kernels. instead: */
-		// ihold(old_dentry->d_inode);
-		WARN_ON(atomic_inc_return(&old_dentry->d_inode->i_count) < 2);
-		// That's it.
-
+		ihold(old_dentry->d_inode);
 #if RHEL6_COMPAT
 		dentry->d_op = &v9fs_dentry_operations;
 #endif

@@ -69,9 +69,8 @@ void _p9_debug(enum p9_debug_flags level, const char *func,
 #define p9_debug(level, fmt, ...)			\
 	_p9_debug(level, __func__, fmt, ##__VA_ARGS__)
 #else
-static inline int __my_no_printk(const char *s, ...) { return 0; }
 #define p9_debug(level, fmt, ...)			\
-	__my_no_printk(fmt, ##__VA_ARGS__)
+	no_printk(fmt, ##__VA_ARGS__)
 #endif
 
 /**
