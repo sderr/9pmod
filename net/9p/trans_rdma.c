@@ -57,7 +57,7 @@
 #define P9_RDMA_IRD		0
 #define P9_RDMA_ORD		0
 #define P9_RDMA_TIMEOUT		30000		/* 30 seconds */
-#define P9_RDMA_MAXSIZE		(1024*1024)	/* 1MB */
+#define P9_RDMA_MAXSIZE		((1024*1024)+4096) /* 1MB + 1 page*/
 
 /**
  * struct p9_trans_rdma - RDMA transport instance
