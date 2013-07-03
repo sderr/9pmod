@@ -7,23 +7,36 @@
 # for weak-modules:
 %define KREL %{kernel_release}
 
-Summary:       9p modules (v9fs)
+# no debuginfo
+%global debug_package %{nil}
+
+
+Summary:       9p modules (v9fs) (source)
 Name:          9pmod
 Version:       %{myversion}
-Release:       %{___kernel_release}%{dist}.Bull.%{myrelease}
+Release:       %{myrelease}
 License:     GPL
 Group:         System Environment/Kernel
 Source:        9pmod.tar.gz
 URL:           www.bull.fr
-ExclusiveOS:   linux
 BuildRoot:     %{_tmppath}/%{name}-%{version}-root-%(id -u -n)
 
-%define _rpmdrivername %{name}-%{version}-%{release}
-
 %description
+Standalone modules for the 9P filesystem (Source)
+
+%define _rpmdrivername 9pmod-ko-%{version}-%{release}
+
+%package ko
+Summary:       9p modules (v9fs) (kernel modules)
+Version:       %{myversion}
+Release:       %{___kernel_release}%{dist}.Bull.%{myrelease}
+Group:         System Environment/Kernel
+
+
+%description ko
 Standalone modules for the 9P filesystem
 
-%prep
+%prep 
 %setup -q -n 9pmod
 
 %build 
@@ -32,7 +45,7 @@ make
 %install
 make INSTALL_MOD_PATH=${RPM_BUILD_ROOT} install
 
-%post
+%post ko
 
 if [ -e "/boot/System.map-%{KREL}" ]; then
     /sbin/depmod -aeF /boot/System.map-%{KREL} %{KREL} > /dev/null 2>&1 || :
@@ -46,12 +59,12 @@ if [ -x "/sbin/weak-modules" ]; then
     printf '%s\n' "${modules[@]}" | /sbin/weak-modules --add-modules 2>/dev/null || true
 fi
 
-%preun
+%preun ko
 
 # Save modules list for the postun phase
 rpm -ql %_rpmdrivername | grep '\.ko$' > /var/run/rpm-kmod-9pmod-modules
 
-%postun
+%postun ko
 
 if [ -e "/boot/System.map-%{KREL}" ]; then
     /sbin/depmod -aeF /boot/System.map-%{KREL} %{KREL} > /dev/null 2>&1 || :
@@ -67,7 +80,7 @@ if [ -x "/sbin/weak-modules" ]; then
 fi
 
 
-%files
+%files ko
 %defattr (-,root,root)
 /lib/modules
 %changelog
