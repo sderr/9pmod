@@ -38,6 +38,8 @@
 #include <linux/list.h>
 #include <linux/spinlock.h>
 
+#include "stats.h"
+
 #ifdef CONFIG_NET_9P_DEBUG
 unsigned int p9_debug_level = 0;	/* feature-rific global debug level  */
 EXPORT_SYMBOL(p9_debug_level);
@@ -177,6 +179,8 @@ static int __init init_p9(void)
 	pr_info("Installing 9P2000 support\n");
 	p9_trans_fd_init();
 
+	stats_init();
+
 	return ret;
 }
 
@@ -190,6 +194,8 @@ static void __exit exit_p9(void)
 	pr_info("Unloading 9P2000 support\n");
 
 	p9_trans_fd_exit();
+
+	stats_exit();
 }
 
 module_init(init_p9)
