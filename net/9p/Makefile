@@ -18,6 +18,7 @@ obj-m += 9pnet_rdma.o
 	protocol.o \
 	trans_fd.o \
 	trans_common.o \
+	stats.o	\
 
 9pnet_virtio-objs := \
 	trans_virtio.o \

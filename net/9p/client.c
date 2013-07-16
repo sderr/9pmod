@@ -39,6 +39,7 @@
 #include <net/9p/client.h>
 #include <net/9p/transport.h>
 #include "protocol.h"
+#include "stats.h"
 
 #define CREATE_TRACE_POINTS
 #include <trace/events/9p.h>
@@ -748,6 +749,10 @@ p9_client_rpc(struct p9_client *c, int8_t type, const char *fmt, ...)
 	int sigpending, err;
 	unsigned long flags;
 	struct p9_req_t *req;
+	ktime_t time;
+
+
+	p9stat_enter(&time);
 
 	va_start(ap, fmt);
 	req = p9_client_prepare_req(c, type, c->msize, fmt, ap);
@@ -805,8 +810,10 @@ again:
 
 	err = p9_check_errors(c, req);
 	trace_9p_client_res(c, type, req->rc->tag, err);
-	if (!err)
+	if (!err) {
+		p9stat_leave(&time);
 		return req;
+	}
 reterr:
 	p9_free_req(c, req);
 	return ERR_PTR(safe_errno(err));
