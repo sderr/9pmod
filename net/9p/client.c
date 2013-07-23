@@ -757,8 +757,10 @@ p9_client_rpc(struct p9_client *c, int8_t type, const char *fmt, ...)
 	va_start(ap, fmt);
 	req = p9_client_prepare_req(c, type, c->msize, fmt, ap);
 	va_end(ap);
-	if (IS_ERR(req))
+	if (IS_ERR(req)) {
+		p9stat_leave(&time);
 		return req;
+	}
 
 	if (signal_pending(current)) {
 		sigpending = 1;
@@ -816,6 +818,7 @@ again:
 	}
 reterr:
 	p9_free_req(c, req);
+	p9stat_leave(&time);
 	return ERR_PTR(safe_errno(err));
 }
 
