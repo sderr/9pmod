@@ -65,20 +65,6 @@ struct p9_fd_opts {
 	u16 port;
 };
 
-/**
- * struct p9_trans_fd - transport state
- * @rd: reference to file to read from
- * @wr: reference of file to write to
- * @conn: connection state reference
- *
- */
-
-struct p9_trans_fd {
-	struct file *rd;
-	struct file *wr;
-	struct p9_conn *conn;
-};
-
 /*
   * Option Parsing (code inspired by NFS code)
   *  - a little lazy - parse all fd-transport options
@@ -153,6 +139,20 @@ struct p9_conn {
 	struct work_struct rq;
 	struct work_struct wq;
 	unsigned long wsched;
+};
+
+/**
+ * struct p9_trans_fd - transport state
+ * @rd: reference to file to read from
+ * @wr: reference of file to write to
+ * @conn: connection state reference
+ *
+ */
+
+struct p9_trans_fd {
+	struct file *rd;
+	struct file *wr;
+	struct p9_conn conn;
 };
 
 static void p9_poll_workfn(struct work_struct *work);
@@ -572,15 +572,13 @@ p9_pollwait(struct file *filp, wait_queue_head_t *wait_address, poll_table *p)
  * Note: Creates the polling task if this is the first session.
  */
 
-static struct p9_conn *p9_conn_create(struct p9_client *client)
+static void p9_conn_create(struct p9_client *client)
 {
 	int n;
-	struct p9_conn *m;
+	struct p9_trans_fd *ts = client->trans;
+	struct p9_conn *m = &ts->conn;
 
 	p9_debug(P9_DEBUG_TRANS, "client %p msize %d\n", client, client->msize);
-	m = kzalloc(sizeof(struct p9_conn), GFP_KERNEL);
-	if (!m)
-		return ERR_PTR(-ENOMEM);
 
 	INIT_LIST_HEAD(&m->mux_list);
 	m->client = client;
@@ -602,8 +600,6 @@ static struct p9_conn *p9_conn_create(struct p9_client *client)
 		p9_debug(P9_DEBUG_TRANS, "mux %p can write\n", m);
 		set_bit(Wpending, &m->wsched);
 	}
-
-	return m;
 }
 
 /**
@@ -662,7 +658,7 @@ static int p9_fd_request(struct p9_client *client, struct p9_req_t *req)
 {
 	int n;
 	struct p9_trans_fd *ts = client->trans;
-	struct p9_conn *m = ts->conn;
+	struct p9_conn *m = &ts->conn;
 
 	p9_debug(P9_DEBUG_TRANS, "mux %p task %p tcall %p id %d\n",
 		 m, current, req->tc, req->tc->id);
@@ -770,7 +766,7 @@ static int parse_opts(char *params, struct p9_fd_opts *opts)
 
 static int p9_fd_open(struct p9_client *client, int rfd, int wfd)
 {
-	struct p9_trans_fd *ts = kmalloc(sizeof(struct p9_trans_fd),
+	struct p9_trans_fd *ts = kzalloc(sizeof(struct p9_trans_fd),
 					   GFP_KERNEL);
 	if (!ts)
 		return -ENOMEM;
@@ -796,9 +792,8 @@ static int p9_socket_open(struct p9_client *client, struct socket *csocket)
 {
 	struct p9_trans_fd *p;
 	struct file *file;
-	int ret;
 
-	p = kmalloc(sizeof(struct p9_trans_fd), GFP_KERNEL);
+	p = kzalloc(sizeof(struct p9_trans_fd), GFP_KERNEL);
 	if (!p)
 		return -ENOMEM;
 
@@ -819,15 +814,7 @@ static int p9_socket_open(struct p9_client *client, struct socket *csocket)
 
 	p->rd->f_flags |= O_NONBLOCK;
 
-	p->conn = p9_conn_create(client);
-	if (IS_ERR(p->conn)) {
-		ret = PTR_ERR(p->conn);
-		p->conn = NULL;
-		kfree(p);
-		sockfd_put(csocket);
-		sockfd_put(csocket);
-		return ret;
-	}
+	p9_conn_create(client);
 	return 0;
 }
 
@@ -871,7 +858,7 @@ static void p9_fd_close(struct p9_client *client)
 
 	client->status = Disconnected;
 
-	p9_conn_destroy(ts->conn);
+	p9_conn_destroy(&ts->conn);
 
 	if (ts->rd)
 		fput(ts->rd);
@@ -995,14 +982,7 @@ p9_fd_create(struct p9_client *client, const char *addr, char *args)
 		return err;
 
 	p = (struct p9_trans_fd *) client->trans;
-	p->conn = p9_conn_create(client);
-	if (IS_ERR(p->conn)) {
-		err = PTR_ERR(p->conn);
-		p->conn = NULL;
-		fput(p->rd);
-		fput(p->wr);
-		return err;
-	}
+	p9_conn_create(client);
 
 	return 0;
 }
