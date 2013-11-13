@@ -75,6 +75,7 @@ static int stats_show(struct seq_file *m, void *v)
 	int i;
 	unsigned long total_reqtime = 0;
 	unsigned long total_nr_req = 0;
+        char tmp[64];
 
 	for_each_online_cpu(j) {
 		total_reqtime += per_cpu(reqtime, j);
@@ -90,13 +91,13 @@ static int stats_show(struct seq_file *m, void *v)
 		for_each_online_cpu(j)
 			total += per_cpu(time_hist, j)[i];
 		if (i < TSLOTS - 1)
-			seq_printf(m, "     %5d - %5d us : %d\n",
-			           i ? 1<<(i+TSHIFT-1) : 0, 
-				   (1<<(i+TSHIFT))-1, total);
+			snprintf(tmp, 64, "%d-%d",
+				 i ? 1<<(i+TSHIFT-1) : 0,
+				 (1<<(i+TSHIFT))-1);
 		else
-			seq_printf(m, "     >= %5d us      : %d\n",
-			           1<<(i+TSHIFT-1), total);
-
+			snprintf(tmp, 64, "%d-",
+				 1<<(i+TSHIFT-1));
+		seq_printf(m, "   %12s : %d\n", tmp, total);
 	}
 
 	seq_printf(m, "Active requests:\n");
@@ -105,11 +106,11 @@ static int stats_show(struct seq_file *m, void *v)
 		for_each_online_cpu(j)
 			total += per_cpu(ar_hist, j)[i];
 		if (i < ASLOTS - 1)
-			seq_printf(m, "     %3d - %3d : %d\n",
-			           i*ASTEP, (i+1) * ASTEP - 1, total);
+			snprintf(tmp, 64, "%d-%d",
+				 i*ASTEP, (i+1) * ASTEP - 1);
 		else
-			seq_printf(m, "     >= %3d    : %d\n",
-			           i*ASTEP, total);
+			snprintf(tmp, 64, "%d-", i*ASTEP);
+		seq_printf(m, "   %12s : %d\n", tmp, total);
 	}
 
 
