@@ -12,3 +12,8 @@ install::
 	
 localinstall::
 	$(MAKE) -C $(KERNELDIR) M=`pwd` INSTALL_MOD_PATH=`pwd`/modules "$$@" modules_install
+
+remoteinstall:: localinstall
+	cd modules && scp -r lib root@$(HOST):/
+	ssh root@$(HOST) depmod -a
+
