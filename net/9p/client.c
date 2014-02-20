@@ -683,13 +683,13 @@ static int p9_client_flush(struct p9_client *c, struct p9_req_t *oldreq)
 	if (IS_ERR(req))
 		return PTR_ERR(req);
 
-
-	/* if we haven't received a response for oldreq,
-	   remove it from the list. */
-	spin_lock(&c->lock);
+	/*
+	 * if we haven't received a response for oldreq,
+	 * remove it from the list
+	 */
 	if (oldreq->status == REQ_STATUS_FLSH)
-		list_del(&oldreq->req_list);
-	spin_unlock(&c->lock);
+		if (c->trans_mod->cancelled)
+			c->trans_mod->cancelled(c, oldreq);
 
 	p9_free_req(c, req);
 	return 0;
