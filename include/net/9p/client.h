@@ -65,7 +65,6 @@ enum p9_trans_status {
  * @REQ_STATUS_ALLOC: request has been allocated but not sent
  * @REQ_STATUS_UNSENT: request waiting to be sent
  * @REQ_STATUS_SENT: request sent to server
- * @REQ_STATUS_FLSH: a flush has been sent for this request
  * @REQ_STATUS_RCVD: response received from server
  * @REQ_STATUS_FLSHD: request has been flushed
  * @REQ_STATUS_ERROR: request encountered an error on the client side
@@ -81,7 +80,6 @@ enum p9_req_status_t {
 	REQ_STATUS_ALLOC,
 	REQ_STATUS_UNSENT,
 	REQ_STATUS_SENT,
-	REQ_STATUS_FLSH,
 	REQ_STATUS_RCVD,
 	REQ_STATUS_FLSHD,
 	REQ_STATUS_ERROR,
