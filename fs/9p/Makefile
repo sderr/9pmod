@@ -7,6 +7,8 @@ EXTRA_CFLAGS += -Wno-cast-qual \
 	-include $(src)/../../include/net/9p/client.h \
 	-include $(src)/../../include/net/9p/transport.h
 
+EXTRA_CFLAGS += -DCONFIG_9P_FSCACHE=1
+
 obj-m := 9p.o
 
 ifeq ($(VERSION),2)
@@ -19,7 +21,8 @@ ifeq ($(VERSION),2)
 	compat/vfs_dir.o \
 	compat/vfs_dentry.o \
 	compat/v9fs.o \
-	compat/fid.o
+	compat/fid.o \
+	compat/cache.o
 else
 9p-objs := \
 	vfs_super.o \
@@ -32,8 +35,8 @@ else
 	v9fs.o \
 	fid.o  \
 	xattr.o \
-	xattr_user.o
+	xattr_user.o \
+	cache.o
 endif
 
-#9p-$(CONFIG_9P_FSCACHE) += cache.o
 #9p-$(CONFIG_9P_FS_POSIX_ACL) += acl.o
