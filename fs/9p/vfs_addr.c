@@ -86,39 +86,6 @@ done:
 	return retval;
 }
 
-static int v9fs_vfs_readpage_sync(struct file *filp, struct page *page)
-{
-	int retval;
-	loff_t offset;
-	char *buffer;
-	struct inode *inode;
-	struct p9_fid *fid;
-
-	inode = page->mapping->host;
-	fid = filp->private_data;
-
-	buffer = kmap(page);
-	offset = page_offset(page);
-
-	retval = v9fs_fid_readn(fid, buffer, NULL, PAGE_CACHE_SIZE, offset);
-	if (retval < 0) {
-		v9fs_uncache_page(inode, page);
-		goto done;
-	}
-
-	memset(buffer + retval, 0, PAGE_CACHE_SIZE - retval);
-	flush_dcache_page(page);
-	SetPageUptodate(page);
-
-	v9fs_readpage_to_fscache(inode, page);
-	retval = 0;
-
-done:
-	kunmap(page);
-	unlock_page(page);
-	return retval;
-}
-
 /**
  * v9fs_vfs_readpage - read an entire page in from 9P
  *
