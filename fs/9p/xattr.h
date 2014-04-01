@@ -18,7 +18,11 @@
 #include <net/9p/9p.h>
 #include <net/9p/client.h>
 
+#if RHEL6_COMPAT
+extern struct xattr_handler *v9fs_xattr_handlers[];
+#else
 extern const struct xattr_handler *v9fs_xattr_handlers[];
+#endif
 extern struct xattr_handler v9fs_xattr_user_handler;
 extern const struct xattr_handler v9fs_xattr_acl_access_handler;
 extern const struct xattr_handler v9fs_xattr_acl_default_handler;
