@@ -166,7 +166,7 @@ static struct dentry *v9fs_mount(struct file_system_type *fs_type, int flags,
 	 * vfs_inode.c::v9fs_vfs_lookup ().
 	 */
 #else
-	if (v9ses->cache)
+	if (v9ses->cache == CACHE_LOOSE || v9ses->cache == CACHE_FSCACHE)
 		sb->s_d_op = &v9fs_cached_dentry_operations;
 	else
 		sb->s_d_op = &v9fs_dentry_operations;

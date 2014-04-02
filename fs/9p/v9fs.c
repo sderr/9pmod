@@ -54,7 +54,7 @@ enum {
 	/* Options that take no arguments */
 	Opt_nodevmap, Opt_asyncreadpage,
 	/* Cache options */
-	Opt_cache_loose, Opt_fscache,
+	Opt_cache_loose, Opt_fscache, Opt_mmap,
 	/* Access options */
 	Opt_access, Opt_posixacl,
 	/* Error token */
@@ -73,6 +73,7 @@ static const match_table_t tokens = {
 	{Opt_cache, "cache=%s"},
 	{Opt_cache_loose, "loose"},
 	{Opt_fscache, "fscache"},
+	{Opt_mmap, "mmap"},
 	{Opt_cachetag, "cachetag=%s"},
 	{Opt_access, "access=%s"},
 	{Opt_posixacl, "posixacl"},
@@ -162,6 +163,10 @@ static int v9fs_parse_options(struct v9fs_session_info *v9ses, char *opts)
 		case Opt_fscache:
 			v9ses->cache = CACHE_FSCACHE;
 			break;
+		case Opt_mmap:
+			v9ses->cache = CACHE_MMAP;
+			printk("CACHE_MMAP Enabled.\n");
+			break;
 		case Opt_cachetag:
 #ifdef CONFIG_9P_FSCACHE
 			v9ses->cachetag = match_strdup(&args[0]);
@@ -180,6 +185,10 @@ static int v9fs_parse_options(struct v9fs_session_info *v9ses, char *opts)
 				v9ses->cache = CACHE_LOOSE;
 			else if (strcmp(s, "fscache") == 0)
 				v9ses->cache = CACHE_FSCACHE;
+			else if (strcmp(s, "mmap") == 0) {
+				v9ses->cache = CACHE_MMAP;
+				printk("CACHE_MMAP Enabled.\n");
+			}
 			else
 				v9ses->cache = CACHE_NONE;
 			kfree(s);
@@ -563,6 +572,7 @@ static int __init init_v9fs(void)
 {
 	int err;
 	printk(KERN_INFO "Installing v9fs 9p2000 file system support\n");
+	printk(KERN_INFO "BUILD DATE " __DATE__ "\n");
 	/* TODO: Setup list of registered trasnport modules */
 	err = register_filesystem(&v9fs_fs_type);
 	if (err < 0) {

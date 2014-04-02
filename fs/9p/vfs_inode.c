@@ -274,15 +274,22 @@ int v9fs_inode_init(struct v9fs_session_info *v9ses,
 	case S_IFREG:
 		if (v9fs_proto_dotl(v9ses)) {
 			inode->i_op = &v9fs_file_inode_operations_dotl;
-			if (v9ses->cache)
+			if (v9ses->cache == CACHE_LOOSE ||
+			    v9ses->cache == CACHE_FSCACHE)
 				inode->i_fop =
 					&v9fs_cached_file_operations_dotl;
+			else if (v9ses->cache == CACHE_MMAP)
+				inode->i_fop = &v9fs_mmap_file_operations_dotl;
 			else
 				inode->i_fop = &v9fs_file_operations_dotl;
 		} else {
 			inode->i_op = &v9fs_file_inode_operations;
-			if (v9ses->cache)
-				inode->i_fop = &v9fs_cached_file_operations;
+			if (v9ses->cache == CACHE_LOOSE ||
+			    v9ses->cache == CACHE_FSCACHE)
+				inode->i_fop =
+					&v9fs_cached_file_operations;
+			else if (v9ses->cache == CACHE_MMAP)
+				inode->i_fop = &v9fs_mmap_file_operations;
 			else
 				inode->i_fop = &v9fs_file_operations;
 		}
@@ -767,7 +774,6 @@ struct dentry *v9fs_vfs_lookup(struct inode *dir, struct dentry *dentry,
 			inode = NULL;
 			goto inst_out;
 		}
-
 		return ERR_PTR(result);
 	}
 

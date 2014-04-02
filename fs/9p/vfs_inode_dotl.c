@@ -251,7 +251,9 @@ v9fs_vfs_create_dotl(struct inode *dir, struct dentry *dentry, int omode,
 
 	v9inode = V9FS_I(inode);
 	mutex_lock(&v9inode->v_mutex);
-	if (v9ses->cache && !v9inode->writeback_fid) {
+	if ((v9ses->cache == CACHE_LOOSE || v9ses->cache == CACHE_FSCACHE) &&
+	    !v9inode->writeback_fid &&
+	    ((flags & O_ACCMODE) != O_RDONLY)) {
 		/*
 		 * clone a fid and add it to writeback_fid
 		 * we do it during open time instead of
@@ -275,11 +277,8 @@ v9fs_vfs_create_dotl(struct inode *dir, struct dentry *dentry, int omode,
 		return PTR_ERR(filp);
 	}
 	filp->private_data = ofid;
-#ifdef CONFIG_9P_FSCACHE
-	if (v9ses->cache)
+	if (v9ses->cache == CACHE_LOOSE || v9ses->cache == CACHE_FSCACHE)
 		v9fs_cache_inode_set_cookie(inode, filp);
-#endif
-	return 0;
 
 error:
 	if (ofid)
@@ -594,7 +593,7 @@ v9fs_vfs_symlink_dotl(struct inode *dir, struct dentry *dentry,
 		goto error;
 	}
 
-	if (v9ses->cache) {
+	if (v9ses->cache == CACHE_LOOSE || v9ses->cache == CACHE_FSCACHE) {
 		/* Now walk from the parent so we can get an unopened fid. */
 		fid = p9_client_walk(dfid, 1, &name, 1);
 		if (IS_ERR(fid)) {
