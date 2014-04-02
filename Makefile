@@ -26,5 +26,5 @@ remoteinstall:: localinstall
 	'*******************************************************';\
 	echo ;\
 	fi
-	cd modules && scp -r lib/modules/$(LOCALVERSION) root@$(HOST):/
+	cd modules && scp -r lib/modules/$(LOCALVERSION) root@$(HOST):/lib/modules/
 	ssh root@$(HOST) depmod -a $(LOCALVERSION)
