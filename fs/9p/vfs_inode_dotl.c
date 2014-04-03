@@ -280,6 +280,7 @@ v9fs_vfs_create_dotl(struct inode *dir, struct dentry *dentry, int omode,
 	if (v9ses->cache == CACHE_LOOSE || v9ses->cache == CACHE_FSCACHE)
 		v9fs_cache_inode_set_cookie(inode, filp);
 
+	return 0;
 error:
 	if (ofid)
 		p9_client_clunk(ofid);

@@ -94,11 +94,12 @@ v9fs_fill_super(struct super_block *sb, struct v9fs_session_info *v9ses,
 #else
 	sb->s_bdi = &v9ses->bdi;
 #endif
-	if (v9ses->cache)
+	/* Hmm. I have a bad feeling about this and the #ifdef above: */
+	if (v9ses->cache == CACHE_LOOSE || v9ses->cache == CACHE_FSCACHE)
 		sb->s_bdi->ra_pages = (VM_MAX_READAHEAD * 1024)/PAGE_CACHE_SIZE;
 
 	sb->s_flags = flags | MS_ACTIVE | MS_DIRSYNC | MS_NOATIME;
-	if (!v9ses->cache)
+	if (!(v9ses->cache == CACHE_LOOSE || v9ses->cache == CACHE_FSCACHE))
 		sb->s_flags |= MS_SYNCHRONOUS;
 
 #ifdef CONFIG_9P_FS_POSIX_ACL
