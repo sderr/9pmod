@@ -7,10 +7,10 @@ all::
 clean::
 	$(MAKE) -C $(KERNELDIR) M=`pwd` "$$@" clean
 
-install::
+install:: all
 	$(MAKE) -C $(KERNELDIR) M=`pwd` "$$@" modules_install
 	
-localinstall::
+localinstall:: all
 	$(MAKE) -C $(KERNELDIR) M=`pwd` INSTALL_MOD_PATH=`pwd`/modules "$$@" modules_install
 
 remoteinstall:: localinstall
