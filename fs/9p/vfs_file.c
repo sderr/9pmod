@@ -70,6 +70,9 @@ int v9fs_file_open(struct inode *inode, struct file *file)
 	else
 		omode = v9fs_uflags2omode(file->f_flags,
 					v9fs_proto_dotu(v9ses));
+	P9_DPRINTK(P9_DEBUG_VFS, ".u %d .L %d omode %o (0x%x)\n", 
+		v9fs_proto_dotu(v9ses), v9fs_proto_dotl(v9ses),
+		omode, omode);
 	fid = file->private_data;
 	if (!fid) {
 		fid = v9fs_fid_clone(file->f_path.dentry);
@@ -497,6 +500,8 @@ v9fs_file_write(struct file *filp, const char __user * data,
 	ssize_t retval = 0;
 	loff_t origin = *offset;
 
+	P9_DPRINTK(P9_DEBUG_VFS, "data %p count %d offset %x flags %x\n", data,
+		(int)count, (int)*offset, filp->f_flags);
 
 	retval = generic_write_checks(filp, &origin, &count, 0);
 	if (retval)
