@@ -596,7 +596,7 @@ v9fs_create(struct v9fs_session_info *v9ses, struct inode *dir,
 		goto error;
 	}
 #if RHEL6_COMPAT
-	if (v9ses->cache)
+	if (v9ses->cache == CACHE_LOOSE || v9ses->cache == CACHE_FSCACHE)
 		dentry->d_op = &v9fs_cached_dentry_operations;
 	else
 		dentry->d_op = &v9fs_dentry_operations;
@@ -661,7 +661,8 @@ v9fs_vfs_create(struct inode *dir, struct dentry *dentry, int mode,
 	if (nd && nd->flags & LOOKUP_OPEN) {
 		v9inode = V9FS_I(dentry->d_inode);
 		mutex_lock(&v9inode->v_mutex);
-		if (v9ses->cache && !v9inode->writeback_fid) {
+		if ((v9ses->cache == CACHE_LOOSE || v9ses->cache == CACHE_FSCACHE) 
+		   && !v9inode->writeback_fid) {
 			/*
 			 * clone a fid and add it to writeback_fid
 			 * we do it during open time instead of
@@ -686,7 +687,7 @@ v9fs_vfs_create(struct inode *dir, struct dentry *dentry, int mode,
 
 		filp->private_data = fid;
 #ifdef CONFIG_9P_FSCACHE
-		if (v9ses->cache)
+		if (v9ses->cache == CACHE_LOOSE || v9ses->cache == CACHE_FSCACHE)
 			v9fs_cache_inode_set_cookie(dentry->d_inode, filp);
 #endif
 	} else
@@ -788,7 +789,7 @@ struct dentry *v9fs_vfs_lookup(struct inode *dir, struct dentry *dentry,
 	if (result < 0)
 		goto error_iput;
 #if RHEL6_COMPAT
-	if ((fid->qid.version) && (v9ses->cache))
+	if ((fid->qid.version) && (v9ses->cache == CACHE_LOOSE || v9ses->cache == CACHE_FSCACHE)) 
 		dentry->d_op = &v9fs_cached_dentry_operations;
 	else
 		dentry->d_op = &v9fs_dentry_operations;
