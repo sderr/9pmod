@@ -516,7 +516,7 @@ v9fs_file_write(struct file *filp, const char __user * data,
 
 	return v9fs_file_write_internal(filp->f_path.dentry->d_inode,
 					filp->private_data,
-					data, count, offset, 1);
+					data, count, &origin, 1);
 out:
 	return retval;
 }
