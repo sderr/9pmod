@@ -498,12 +498,11 @@ v9fs_file_write(struct file *filp, const char __user * data,
 		size_t count, loff_t *offset)
 {
 	ssize_t retval = 0;
-	loff_t origin = *offset;
 
 	P9_DPRINTK(P9_DEBUG_VFS, "data %p count %d offset %x flags %x\n", data,
 		(int)count, (int)*offset, filp->f_flags);
 
-	retval = generic_write_checks(filp, &origin, &count, 0);
+	retval = generic_write_checks(filp, offset, &count, 0);
 	if (retval)
 		goto out;
 
@@ -516,7 +515,7 @@ v9fs_file_write(struct file *filp, const char __user * data,
 
 	return v9fs_file_write_internal(filp->f_path.dentry->d_inode,
 					filp->private_data,
-					data, count, &origin, 1);
+					data, count, offset, 1);
 out:
 	return retval;
 }
