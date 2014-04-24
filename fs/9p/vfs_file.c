@@ -94,28 +94,27 @@ int v9fs_file_open(struct inode *inode, struct file *file)
 	}
 
 	file->private_data = fid;
-	mutex_lock(&v9inode->v_mutex);
-	if ((v9ses->cache == CACHE_LOOSE || v9ses->cache == CACHE_FSCACHE) &&
-	    !v9inode->writeback_fid &&
-	    ((file->f_flags & O_ACCMODE) != O_RDONLY)) {
-		/*
-		 * clone a fid and add it to writeback_fid
-		 * we do it during open time instead of
-		 * page dirty time via write_begin/page_mkwrite
-		 * because we want write after unlink usecase
-		 * to work.
-		 */
-		fid = v9fs_writeback_fid(file->f_path.dentry);
-		if (IS_ERR(fid)) {
-			err = PTR_ERR(fid);
-			mutex_unlock(&v9inode->v_mutex);
-			goto out_error;
+	if (v9ses->cache == CACHE_LOOSE || v9ses->cache == CACHE_FSCACHE) {
+		mutex_lock(&v9inode->v_mutex);
+		if (!v9inode->writeback_fid &&
+		    ((file->f_flags & O_ACCMODE) != O_RDONLY)) {
+			/*
+			 * clone a fid and add it to writeback_fid
+			 * we do it during open time instead of
+			 * page dirty time via write_begin/page_mkwrite
+			 * because we want write after unlink usecase
+			 * to work.
+			 */
+			fid = v9fs_writeback_fid(file->f_path.dentry);
+			if (IS_ERR(fid)) {
+				err = PTR_ERR(fid);
+				mutex_unlock(&v9inode->v_mutex);
+				goto out_error;
+			}
+			v9inode->writeback_fid = (void *) fid;
 		}
-		v9inode->writeback_fid = (void *) fid;
+		mutex_unlock(&v9inode->v_mutex);
 	}
-	mutex_unlock(&v9inode->v_mutex);
-	if (v9ses->cache == CACHE_LOOSE || v9ses->cache == CACHE_FSCACHE)
-		v9fs_cache_inode_set_cookie(inode, file);
 	return 0;
 out_error:
 	p9_client_clunk(file->private_data);

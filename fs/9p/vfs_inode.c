@@ -660,25 +660,26 @@ v9fs_vfs_create(struct inode *dir, struct dentry *dentry, int mode,
 	/* if we are opening a file, assign the open fid to the file */
 	if (nd && nd->flags & LOOKUP_OPEN) {
 		v9inode = V9FS_I(dentry->d_inode);
-		mutex_lock(&v9inode->v_mutex);
-		if ((v9ses->cache == CACHE_LOOSE || v9ses->cache == CACHE_FSCACHE) 
-		   && !v9inode->writeback_fid) {
-			/*
-			 * clone a fid and add it to writeback_fid
-			 * we do it during open time instead of
-			 * page dirty time via write_begin/page_mkwrite
-			 * because we want write after unlink usecase
-			 * to work.
-			 */
-			inode_fid = v9fs_writeback_fid(dentry);
-			if (IS_ERR(inode_fid)) {
-				err = PTR_ERR(inode_fid);
-				mutex_unlock(&v9inode->v_mutex);
-				goto error;
+		if (v9ses->cache == CACHE_LOOSE || v9ses->cache == CACHE_FSCACHE) {
+			mutex_lock(&v9inode->v_mutex);
+			if (!v9inode->writeback_fid) {
+				/*
+				 * clone a fid and add it to writeback_fid
+				 * we do it during open time instead of
+				 * page dirty time via write_begin/page_mkwrite
+				 * because we want write after unlink usecase
+				 * to work.
+				 */
+				inode_fid = v9fs_writeback_fid(dentry);
+				if (IS_ERR(inode_fid)) {
+					err = PTR_ERR(inode_fid);
+					mutex_unlock(&v9inode->v_mutex);
+					goto error;
+				}
+				v9inode->writeback_fid = (void *) inode_fid;
 			}
-			v9inode->writeback_fid = (void *) inode_fid;
+			mutex_unlock(&v9inode->v_mutex);
 		}
-		mutex_unlock(&v9inode->v_mutex);
 		filp = lookup_instantiate_filp(nd, dentry, generic_file_open);
 		if (IS_ERR(filp)) {
 			err = PTR_ERR(filp);
