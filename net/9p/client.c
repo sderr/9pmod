@@ -1092,6 +1092,24 @@ free_client:
 }
 EXPORT_SYMBOL(p9_client_create);
 
+/* Attempt to kill a client on error.
+ * XXX Probably lacks proper locking !
+ */
+void p9_kill_client(struct p9_client *client)
+{
+	int16_t tag;
+	p9_debug(P9_DEBUG_9P, "Kill client %p\n", client);
+	/* tags go from -1 to max_tag-1 */
+	for (tag = 0; tag <= client->max_tag; tag++) {
+		struct p9_req_t *req = p9_tag_lookup(client, tag - 1);
+		if (req && req->status == REQ_STATUS_SENT) {
+			p9_debug(P9_DEBUG_9P, "Terminate rpc for request %p\n", req);
+			p9_client_cb(client, req, REQ_STATUS_ERROR);
+		}
+	}
+}
+EXPORT_SYMBOL(p9_kill_client);
+
 void p9_client_destroy(struct p9_client *clnt)
 {
 	struct p9_fid *fid, *fidptr;

@@ -315,6 +315,7 @@ handle_recv(struct p9_client *client, struct p9_trans_rdma *rdma,
 	p9_debug(P9_DEBUG_ERROR, "req %p err %d status %d\n", req, err, status);
 	rdma->state = P9_RDMA_FLUSHING;
 	client->status = Disconnected;
+	p9_kill_client(client);
 }
 
 static void
