@@ -343,6 +343,12 @@ static void cq_comp_handler(struct ib_cq *cq, void *cq_context)
 	while ((ret = ib_poll_cq(cq, 1, &wc)) > 0) {
 		struct p9_rdma_context *c = (void *) (unsigned long) wc.wr_id;
 
+		if (wc.status != IB_WC_SUCCESS) {
+			pr_err("work request failed, status=%d\n",
+				 wc.status);
+			continue;
+		}
+
 		switch (c->wc_op) {
 		case IB_WC_RECV:
 			handle_recv(client, rdma, c, wc.status, wc.byte_len);
