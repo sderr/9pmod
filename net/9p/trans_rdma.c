@@ -46,6 +46,10 @@
 #include <net/9p/9p.h>
 #include <net/9p/client.h>
 #include <net/9p/transport.h>
+
+#ifdef HAVE_COMPAT_RDMA                                                                         
+#include <linux/compat-2.6.h>                                                                   
+#endif                                            
 #include <rdma/ib_verbs.h>
 #include <rdma/rdma_cm.h>
 
@@ -636,7 +640,7 @@ rdma_create_trans(struct p9_client *client, const char *addr, char *args)
 
 	/* Create the RDMA CM ID */
 	rdma->cm_id = rdma_create_id(p9_cm_event_handler, client, RDMA_PS_TCP
-#ifndef IBBACKPORT	
+#ifdef HAVE_RDMA_CM_QP_TYPE
 				     ,IB_QPT_RC
 #endif				     
 				     );

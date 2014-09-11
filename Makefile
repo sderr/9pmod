@@ -2,6 +2,7 @@
 KERNELDIR := $(KERNEL_HEADERS)
 
 all::
+	./configure
 	$(MAKE) -C $(KERNELDIR) M=`pwd` "$$@" modules
 
 clean::

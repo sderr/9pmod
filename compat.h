@@ -7,6 +7,9 @@
 #define RHEL6_COMPAT 1
 #define CONFIG_NET_9P_DEBUG 1
 
+/* some things can only be tested in ./configure */
+#include "config.h"
+
 /* prereqs for 9p includes pulled in early with -include */
 #include <linux/types.h>
 #include <linux/kthread.h>

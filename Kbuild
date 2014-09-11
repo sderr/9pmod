@@ -7,8 +7,7 @@ KBUILD_EXTRA_SYMBOLS += $(OFED_HEADERS)/Module.symvers
 # we need to *modify* LINUXINCLUDE (wich already contains include, arch..)
 LINUXINCLUDE = -I$(OFED_HEADERS)/include \
                -Iarch/$(SRCARCH)/include -Iinclude \
-	       -include include/linux/autoconf.h \
-	       -DIBBACKPORT	       
+	       -include include/linux/autoconf.h
 endif
 
 obj-m  := fs/9p/ net/9p/
