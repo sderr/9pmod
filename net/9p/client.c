@@ -1104,6 +1104,7 @@ void p9_kill_client(struct p9_client *client)
 		struct p9_req_t *req = p9_tag_lookup(client, tag - 1);
 		if (req && req->status == REQ_STATUS_SENT) {
 			p9_debug(P9_DEBUG_9P, "Terminate rpc for request %p\n", req);
+			req->t_err = -EIO; /* Needed for REQ_STATUS_ERROR */
 			p9_client_cb(client, req, REQ_STATUS_ERROR);
 		}
 	}
