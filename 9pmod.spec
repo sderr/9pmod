@@ -1,4 +1,4 @@
-%define myversion 1.0
+%define myversion 1.1
 %define myrelease 1
 
 %define kernel_release %(echo ${KERNEL_RELEASE})
@@ -84,3 +84,13 @@ fi
 %defattr (-,root,root)
 /lib/modules
 %changelog
+* Wed Sep 17 2014 simon.derr@bull.net
++ portage mmap
++ most recent commits:
++ 2cb239f Set error status to killed connections
++ 9406ddf Added a ./configure to detect differences in OFED versions.
++ 850c11d 9P/9PRDMA: wake up processes on transport error
++ e3522f5 9P: avoid taking mutex if possible
++ 7536255b Now fix back the general write case
++ d9b8d2b Fix O_APPEND
+
