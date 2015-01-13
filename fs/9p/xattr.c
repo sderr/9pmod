@@ -162,11 +162,7 @@ ssize_t v9fs_listxattr(struct dentry *dentry, char *buffer, size_t buffer_size)
 	return v9fs_xattr_get(dentry, NULL, buffer, buffer_size);
 }
 
-#if RHEL6_COMPAT
-struct xattr_handler *v9fs_xattr_handlers[] = {
-#else
-const struct xattr_handler *v9fs_xattr_handlers[] = {
-#endif
+struct compat_xattr_handler *v9fs_xattr_handlers[] = {
 	&v9fs_xattr_user_handler,
 #ifdef CONFIG_9P_FS_POSIX_ACL
 	&v9fs_xattr_acl_access_handler,

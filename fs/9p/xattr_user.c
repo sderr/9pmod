@@ -73,7 +73,7 @@ static int v9fs_xattr_user_set(struct dentry *dentry, const char *name,
 	return retval;
 }
 
-struct xattr_handler v9fs_xattr_user_handler = {
+struct compat_xattr_handler v9fs_xattr_user_handler = {
 	.prefix	= XATTR_USER_PREFIX,
 	.get	= v9fs_xattr_user_get,
 	.set	= v9fs_xattr_user_set,

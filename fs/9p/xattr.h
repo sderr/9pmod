@@ -19,13 +19,34 @@
 #include <net/9p/client.h>
 
 #if RHEL6_COMPAT
-extern struct xattr_handler *v9fs_xattr_handlers[];
+struct inode;
+struct dentry;
+
+struct compat_xattr_handler {
+	const char *prefix;
+	int flags;      /* fs private flags passed back to the handlers */
+	size_t (*list)(struct dentry *dentry, char *list, size_t list_size,
+	               const char *name, size_t name_len, int handler_flags);
+	int (*get)(struct dentry *dentry, const char *name, void *buffer,
+	               size_t size, int handler_flags);
+	int (*set)(struct dentry *dentry, const char *name, const void *buffer,
+	               size_t size, int flags, int handler_flags);
+};
+
+
+
+extern struct compat_xattr_handler *v9fs_xattr_handlers[];
+ssize_t v9fs_vfs_getxattr(struct dentry *dentry, const char *name, void *buffer, size_t size);
+ssize_t v9fs_vfs_listxattr(struct dentry *dentry, char *buffer, size_t buffer_size);
+int v9fs_vfs_setxattr(struct dentry *dentry, const char *name, const void *value, size_t size, int flags);
+int v9fs_vfs_removexattr(struct dentry *dentry, const char *name);
 #else
 extern const struct xattr_handler *v9fs_xattr_handlers[];
 #endif
-extern struct xattr_handler v9fs_xattr_user_handler;
-extern const struct xattr_handler v9fs_xattr_acl_access_handler;
-extern const struct xattr_handler v9fs_xattr_acl_default_handler;
+
+extern struct compat_xattr_handler v9fs_xattr_user_handler;
+extern const struct compat_xattr_handler v9fs_xattr_acl_access_handler;
+extern const struct compat_xattr_handler v9fs_xattr_acl_default_handler;
 
 extern ssize_t v9fs_fid_xattr_get(struct p9_fid *, const char *,
 				  void *, size_t);

@@ -21,4 +21,5 @@ obj-m := 9p.o
 	vfs_dentry.o \
 	v9fs.o \
 	fid.o \
+	xattr.o xattr_user.o xattr_glue.o\
 	cache.o

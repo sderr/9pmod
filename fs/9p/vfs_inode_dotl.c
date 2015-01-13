@@ -874,7 +874,10 @@ const struct inode_operations v9fs_dir_inode_operations_dotl = {
 	.getattr = v9fs_vfs_getattr_dotl,
 	.setattr = v9fs_vfs_setattr_dotl,
 #if RHEL6_COMPAT
-/* no xattrs for now */
+	.setxattr = v9fs_vfs_setxattr,
+	.getxattr = v9fs_vfs_getxattr,
+	.removexattr = v9fs_vfs_removexattr,
+	.listxattr = v9fs_listxattr,
 #else
 	.setxattr = generic_setxattr,
 	.getxattr = generic_getxattr,
@@ -888,7 +891,10 @@ const struct inode_operations v9fs_file_inode_operations_dotl = {
 	.getattr = v9fs_vfs_getattr_dotl,
 	.setattr = v9fs_vfs_setattr_dotl,
 #if RHEL6_COMPAT
-/* no xattrs for now */
+	.setxattr = v9fs_vfs_setxattr,
+	.getxattr = v9fs_vfs_getxattr,
+	.removexattr = v9fs_vfs_removexattr,
+	.listxattr = v9fs_listxattr,
 #else
 	.setxattr = generic_setxattr,
 	.getxattr = generic_getxattr,
@@ -905,7 +911,10 @@ const struct inode_operations v9fs_symlink_inode_operations_dotl = {
 	.getattr = v9fs_vfs_getattr_dotl,
 	.setattr = v9fs_vfs_setattr_dotl,
 #if RHEL6_COMPAT
-/* no xattrs for now */
+	.setxattr = v9fs_vfs_setxattr,
+	.getxattr = v9fs_vfs_getxattr,
+	.removexattr = v9fs_vfs_removexattr,
+	.listxattr = v9fs_listxattr,
 #else
 	.setxattr = generic_setxattr,
 	.getxattr = generic_getxattr,

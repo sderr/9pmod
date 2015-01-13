@@ -388,14 +388,14 @@ err_out:
 	return retval;
 }
 
-const struct xattr_handler v9fs_xattr_acl_access_handler = {
+const struct compat_xattr_handler v9fs_xattr_acl_access_handler = {
 	.prefix	= POSIX_ACL_XATTR_ACCESS,
 	.flags	= ACL_TYPE_ACCESS,
 	.get	= v9fs_xattr_get_acl,
 	.set	= v9fs_xattr_set_acl,
 };
 
-const struct xattr_handler v9fs_xattr_acl_default_handler = {
+const struct compat_xattr_handler v9fs_xattr_acl_default_handler = {
 	.prefix	= POSIX_ACL_XATTR_DEFAULT,
 	.flags	= ACL_TYPE_DEFAULT,
 	.get	= v9fs_xattr_get_acl,
