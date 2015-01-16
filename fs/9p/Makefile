@@ -22,4 +22,5 @@ obj-m := 9p.o
 	v9fs.o \
 	fid.o \
 	xattr.o xattr_user.o xattr_glue.o\
+	xattr_security.o xattr_trusted.o\
 	cache.o
