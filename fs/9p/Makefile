@@ -7,7 +7,7 @@ EXTRA_CFLAGS += -Wno-cast-qual \
 	-include $(src)/../../include/net/9p/client.h \
 	-include $(src)/../../include/net/9p/transport.h
 
-EXTRA_CFLAGS += -DCONFIG_9P_FSCACHE=1
+EXTRA_CFLAGS += -DCONFIG_9P_FSCACHE=1 -DCONFIG_9P_FS_POSIX_ACL=1
 
 obj-m := 9p.o
 
@@ -23,4 +23,5 @@ obj-m := 9p.o
 	fid.o \
 	xattr.o xattr_user.o xattr_glue.o\
 	xattr_security.o xattr_trusted.o\
+	acl.o \
 	cache.o

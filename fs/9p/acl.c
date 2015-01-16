@@ -96,13 +96,10 @@ static struct posix_acl *v9fs_get_cached_acl(struct inode *inode, int type)
 	return acl;
 }
 
-int v9fs_check_acl(struct inode *inode, int mask, unsigned int flags)
+int v9fs_check_acl(struct inode *inode, int mask)
 {
 	struct posix_acl *acl;
 	struct v9fs_session_info *v9ses;
-
-	if (flags & IPERM_FLAG_RCU)
-		return -ECHILD;
 
 	v9ses = v9fs_inode2v9ses(inode);
 	if (((v9ses->flags & V9FS_ACCESS_MASK) != V9FS_ACCESS_CLIENT) ||
@@ -388,14 +385,14 @@ err_out:
 	return retval;
 }
 
-const struct compat_xattr_handler v9fs_xattr_acl_access_handler = {
+struct compat_xattr_handler v9fs_xattr_acl_access_handler = {
 	.prefix	= POSIX_ACL_XATTR_ACCESS,
 	.flags	= ACL_TYPE_ACCESS,
 	.get	= v9fs_xattr_get_acl,
 	.set	= v9fs_xattr_set_acl,
 };
 
-const struct compat_xattr_handler v9fs_xattr_acl_default_handler = {
+struct compat_xattr_handler v9fs_xattr_acl_default_handler = {
 	.prefix	= POSIX_ACL_XATTR_DEFAULT,
 	.flags	= ACL_TYPE_DEFAULT,
 	.get	= v9fs_xattr_get_acl,
