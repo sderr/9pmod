@@ -1,4 +1,4 @@
-%define myversion 1.1
+%define myversion 1.2
 %define myrelease 1
 
 %define kernel_release %(echo ${KERNEL_RELEASE})
@@ -84,6 +84,11 @@ fi
 %defattr (-,root,root)
 /lib/modules
 %changelog
+* Mon Jan 19 2015 simon.derr@bull.net
++ b4431d8 xattr: Enable ACLs
++ 6eca325 xattr: add trusted.* security.*
++ a6c78a8 Adding xattrs
++ c35cb27 Fix handling of work request failure at completion queue polling
 * Wed Sep 17 2014 simon.derr@bull.net
 + portage mmap
 + most recent commits:
