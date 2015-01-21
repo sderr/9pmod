@@ -6,6 +6,7 @@
 #include <linux/slab.h>
 #include <linux/sched.h>
 #include <linux/uaccess.h>
+#include <linux/seq_file.h>
 #include <net/9p/9p.h>
 #include <linux/proc_fs.h>
 #include <net/9p/client.h>
@@ -119,7 +120,7 @@ static int stats_show(struct seq_file *m, void *v)
 
 static int stats_open(struct inode *inode, struct file *file)
 {
-	return single_open(file, stats_show, PDE(inode)->data);
+	return single_open(file, stats_show, PDE_DATA(inode));
 }
 
 static const struct file_operations stats_fops = {
