@@ -1,3 +1,6 @@
+include $(M)/9p.config
+
+
 obj-$(CONFIG_9P_FS) := 9p.o
 
 9p-objs := \
