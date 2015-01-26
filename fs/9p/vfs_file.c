@@ -692,7 +692,7 @@ v9fs_cached_file_read(struct file *filp, char __user *data, size_t count,
 {
 	if (filp->f_flags & O_DIRECT)
 		return v9fs_direct_read(filp, data, count, offset);
-	return new_sync_read(filp, data, count, offset);
+	return do_sync_read(filp, data, count, offset);
 }
 
 /**
@@ -760,7 +760,7 @@ err_out:
 
 buff_write:
 	mutex_unlock(&inode->i_mutex);
-	return new_sync_write(filp, data, count, offsetp);
+	return do_sync_write(filp, data, count, offsetp);
 }
 
 /**
@@ -778,7 +778,7 @@ v9fs_cached_file_write(struct file *filp, const char __user * data,
 
 	if (filp->f_flags & O_DIRECT)
 		return v9fs_direct_write(filp, data, count, offset);
-	return new_sync_write(filp, data, count, offset);
+	return do_sync_write(filp, data, count, offset);
 }
 
 
@@ -829,7 +829,6 @@ static void v9fs_mmap_vm_close(struct vm_area_struct *vma)
 
 static const struct vm_operations_struct v9fs_file_vm_ops = {
 	.fault = filemap_fault,
-	.map_pages = filemap_map_pages,
 	.page_mkwrite = v9fs_vm_page_mkwrite,
 	.remap_pages = generic_file_remap_pages,
 };
@@ -837,7 +836,6 @@ static const struct vm_operations_struct v9fs_file_vm_ops = {
 static const struct vm_operations_struct v9fs_mmap_file_vm_ops = {
 	.close = v9fs_mmap_vm_close,
 	.fault = filemap_fault,
-	.map_pages = filemap_map_pages,
 	.page_mkwrite = v9fs_vm_page_mkwrite,
 	.remap_pages = generic_file_remap_pages,
 };
@@ -847,8 +845,8 @@ const struct file_operations v9fs_cached_file_operations = {
 	.llseek = generic_file_llseek,
 	.read = v9fs_cached_file_read,
 	.write = v9fs_cached_file_write,
-	.read_iter = generic_file_read_iter,
-	.write_iter = generic_file_write_iter,
+	.aio_read = generic_file_aio_read,
+	.aio_write = generic_file_aio_write,
 	.open = v9fs_file_open,
 	.release = v9fs_dir_release,
 	.lock = v9fs_file_lock,
@@ -860,8 +858,8 @@ const struct file_operations v9fs_cached_file_operations_dotl = {
 	.llseek = generic_file_llseek,
 	.read = v9fs_cached_file_read,
 	.write = v9fs_cached_file_write,
-	.read_iter = generic_file_read_iter,
-	.write_iter = generic_file_write_iter,
+	.aio_read = generic_file_aio_read,
+	.aio_write = generic_file_aio_write,
 	.open = v9fs_file_open,
 	.release = v9fs_dir_release,
 	.lock = v9fs_file_lock_dotl,
