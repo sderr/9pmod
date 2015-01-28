@@ -1,8 +1,3 @@
-CONFIG_9P_FS = m
-CONFIG_NET_9P = m
-# CONFIG_NET_9P_VIRTIO not set
-CONFIG_NET_9P_RDMA = m
-
 ccflags-y = --include $(M)/9pincludes.h \
         --include $(M)/include/net/9p/9p.h \
         --include $(M)/include/net/9p/client.h \
@@ -12,3 +7,4 @@ ccflags-y = --include $(M)/9pincludes.h \
 	--include $(M)/9pincludes_post.h \
 	-fmax-errors=2
 
+include $(M)/config.9p

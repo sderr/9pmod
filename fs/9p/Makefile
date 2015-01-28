@@ -1,4 +1,4 @@
-include $(M)/9p.config
+include $(M)/9p.buildopts
 
 
 obj-$(CONFIG_9P_FS) := 9p.o

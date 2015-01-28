@@ -8,6 +8,6 @@ KBUILD_EXTRA_SYMBOLS += $(OFED_HEADERS)/Module.symvers
 OFEDINCLUDE = -I$(OFED_HEADERS)/include
 endif
 
-include $(M)/9p.config
+include $(M)/9p.buildopts
 
 obj-m  := fs/9p/ net/9p/

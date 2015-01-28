@@ -1,11 +1,12 @@
 # to build this KERNEL_HEADERS must be set.
 KERNELDIR := $(KERNEL_HEADERS)
 
-all::
+all:: options
 	$(MAKE) -C $(KERNELDIR) M=`pwd` "$$@" modules
 
 clean::
 	$(MAKE) -C $(KERNELDIR) M=`pwd` "$$@" clean
+	rm -f 9pconfig.make 9pconfig.h
 
 install:: all
 	$(MAKE) -C $(KERNELDIR) M=`pwd` "$$@" modules_install
@@ -28,3 +29,11 @@ remoteinstall:: localinstall
 	fi
 	cd modules && scp -r lib/modules/$(LOCALVERSION) root@$(HOST):/lib/modules/
 	ssh root@$(HOST) depmod -a $(LOCALVERSION)
+
+options: 9pconfig.make 9pconfig.h
+
+9pconfig.make: config.9p
+	(echo '# Generated from config.9p' ; cat config.9p ) > 9pconfig.make
+
+9pconfig.h: config.9p
+	(echo '// Generated from config.9p' ; cat config.9p  | sed -n 's/^\(CONFIG[^=]*\).*/#define \1 1/p' ) > 9pconfig.h

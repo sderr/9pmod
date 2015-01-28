@@ -1,4 +1,4 @@
-include $(M)/9p.config
+include $(M)/9p.buildopts
 
 
 obj-$(CONFIG_NET_9P) := 9pnet.o

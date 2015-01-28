@@ -5,7 +5,4 @@
 #include <linux/idr.h>
 #include <linux/slab.h>
 
-//#define CONFIG_9P_FSCACHE 1
-#define CONFIG_9P_FS_POSIX_ACL 1
-//#define CONFIG_9P_FS_SECURITY 1
-#define CONFIG_NET_9P_DEBUG 1
+#include "9pconfig.h"
