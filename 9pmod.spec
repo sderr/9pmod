@@ -1,5 +1,5 @@
 %define myversion 3.1
-%define myrelease 1
+%define myrelease 2
 
 %define kernel_release %(echo ${KERNEL_RELEASE})
 %define ___kernel_release %(echo ${KERNEL_RELEASE} | tr - _)
@@ -45,6 +45,9 @@ make
 %install
 make INSTALL_MOD_PATH=${RPM_BUILD_ROOT} install
 
+#remove depmod files
+rm -f ${RPM_BUILD_ROOT}/lib/modules/%{KREL}/* 2>&1 || true
+
 %post ko
 
 if [ -e "/boot/System.map-%{KREL}" ]; then
@@ -82,7 +85,9 @@ fi
 
 %files ko
 %defattr (-,root,root)
-/lib/modules
+/lib/modules/%{KREL}/extra
 %changelog
 * Thu Jan 22 2015 simon.derr@bull.net
+- remove depmod-generated files
+* Tue Feb 24 2015 simon.derr@bull.net
 + initial creation
