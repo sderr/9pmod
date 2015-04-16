@@ -89,7 +89,7 @@ fi
 %changelog
 * Thu Apr 16 2015 simon.derr@bull.net
 - 7fdf32d Increase max RDMA buffer size to fit 1MB read/writes
-* Thu Jan 22 2015 simon.derr@bull.net
-- remove depmod-generated files
 * Tue Feb 24 2015 simon.derr@bull.net
+- remove depmod-generated files
+* Thu Jan 22 2015 simon.derr@bull.net
 + initial creation
