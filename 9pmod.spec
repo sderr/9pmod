@@ -1,4 +1,4 @@
-%define myversion 3.1
+%define myversion 3.2
 %define myrelease 2
 
 %define kernel_release %(echo ${KERNEL_RELEASE})
@@ -87,6 +87,8 @@ fi
 %defattr (-,root,root)
 /lib/modules/%{KREL}/extra
 %changelog
+* Thu Apr 16 2015 simon.derr@bull.net
+- 7fdf32d Increase max RDMA buffer size to fit 1MB read/writes
 * Thu Jan 22 2015 simon.derr@bull.net
 - remove depmod-generated files
 * Tue Feb 24 2015 simon.derr@bull.net
